@@ -1,0 +1,16 @@
+# Core runtime dependencies
+numpy==2.3.2
+pandas==3.0.2
+scikit-learn==1.8.0
+PyYAML==6.0.2
+scipy==1.17.1
+tqdm==4.67.1
+
+# PyTorch stack (CUDA build installed in this container)
+torch==2.8.0+cu128
+torchvision==0.23.0+cu128
+torchaudio==2.8.0+cu128
+
+# Visualization and reporting
+matplotlib==3.10.9
+seaborn==0.13.2

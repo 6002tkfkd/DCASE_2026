@@ -1,0 +1,106 @@
+strategy: baseline/two_stage_exp2_proxy_pre_proxy_simple_ft_h_loss_proxy_simple_cosine_hf1_filter_30_filter1_grand_40_filter2_no_conf1
+pretrain_dataset: BSD35k-CS
+finetune_dataset: BSD10k-v1.2
+datasets:
+  BSD10k-v1.2:
+    metadata_csv: ./data/BSD10k-v1.2/metadata/BSD10k_metadata.csv
+    audio_emb_folder: ./embedding/baseline/10k
+    text_emb_folder: ./data/BSD10k-v1.2/features/clap_text_embeddings
+  BSD35k-CS:
+    metadata_csv: ./data/BSD35k-CS/metadata/BSD35k-CS_metadata.csv
+    audio_emb_folder: ./embedding/baseline/35k
+    text_emb_folder: ./data/BSD35k-CS/features/clap_text_embeddings
+paths:
+  data_root: ./data
+  processed_basename: processed_dataset.csv
+output:
+  root: ./output
+  run_dir: baseline/two_stage_exp2_proxy/pre_proxy_simple_ft_h_loss_proxy_simple_cosine_hf1_filter_30_filter1_grand_40_filter2_no_conf1
+  pretrain_dir: baseline/two_stage_exp2_proxy/pre_proxy_simple_ft_h_loss_proxy_simple_cosine_hf1_filter_30_filter1_grand_40_filter2_no_conf1
+model:
+  name: base_classifier_proxy_anchor_simple
+  embedding_dim: 128
+artifact_names:
+  processed_dataset_csv: processed_dataset.csv
+  class_dict_json: class_dict.json
+  top_class_dict_json: top_class_dict.json
+  top_class_subclass_dict_json: top_class_subclass_dict.json
+trainer:
+  mode: both
+pretrain:
+  enabled: true
+  training:
+    run_mode: dual_head
+    batch_size: 64
+    num_epochs: 50
+    lr: 0.0005
+    scheduler_type: cosine
+    scheduler_params:
+      t_max: 25
+    patience: 5
+    early_stopping_metric: hF1
+    proxy_weight: 1.0
+    classification_weight: 1.0
+    proxy_loss: Proxy_Anchor
+    proxy_loss_params:
+      mrg: 0.1
+      alpha: 32
+    classifier_loss: FocalLoss
+    classifier_loss_params:
+      gamma: 2.0
+      alpha: 0.25
+finetune:
+  enabled: true
+  k_folds: 5
+  training:
+    run_mode: dual_head
+    batch_size: 64
+    num_epochs: 50
+    lr: 0.0005
+    scheduler_type: cosine
+    scheduler_params:
+      t_max: 25
+    patience: 10
+    early_stopping_metric: hF1
+    proxy_weight: 0.1
+    classification_weight: 0.9
+    proxy_loss: HierarchicalProxyLoss
+    proxy_loss_params:
+      temperature: 0.07
+      alpha: 0.3
+      beta: 0.5
+      gamma: 0.2
+      delta: 0.1
+      sibling_margin: 0.4
+      parent_margin: 0.0
+    classifier_loss: FocalLoss
+    classifier_loss_params:
+      gamma: 2.0
+      alpha: 0.25
+evaluation:
+  batch_size: 128
+  num_workers: 4
+  device: auto
+  save_manifest: true
+evaluator_config:
+  type: hierarchical_proxy_classification
+filtering:
+  stage1:
+    enabled: true
+    review_actions_csv: filter/grand_pruned_BSD35k-CS_40pct.csv
+    report_dir: ./output/filter_reports
+    report_name_template: '{tag}_stage1_filter_report.json'
+  stage2:
+    enabled: false
+    review_actions_csv: null
+    report_dir: ./output/filter_reports
+    report_name_template: '{tag}_fold_{fold}_{split}_stage2_filter_report.json'
+embeddings:
+  enabled: false
+  extractors: []
+  audio_dirname: audio_embeddings
+  text_dirname: text_embeddings
+logging:
+  run_log_csv: run_log.csv
+repro:
+  seed: 1821

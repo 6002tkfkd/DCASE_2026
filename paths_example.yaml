@@ -1,0 +1,45 @@
+# DCASE2026 Task 1 — Path Configuration Template
+#
+# Usage:
+#   cp paths_example.yaml paths.yaml
+#   # Edit paths.yaml to match your environment
+#   python scripts/extract_embeddings.py --paths paths.yaml --dataset BSD10k-v1.2
+#   python scripts/train_twostage.py     --config configs/... --paths paths.yaml
+#   PATHS_FILE=paths.yaml bash scripts/run_all_embedding_configs.sh
+#
+# Default values (below) assume you run from the repo root
+# and all data/embeddings/outputs live inside it.
+
+# ── Dataset paths ──────────────────────────────────────────────────────────────
+# BSD10k-v1.2 must be at {data_root}/BSD10k-v1.2/
+# BSD35k-CS   must be at {data_root}/BSD35k-CS/
+data_root: ./data
+
+# ── Embedding paths ────────────────────────────────────────────────────────────
+# scripts/extract_embeddings.py writes here:
+#   {embedding_root}/{backbone}/{10k|35k}/{sound_id}.npy
+embedding_root: ./embedding
+
+# ── Training output ────────────────────────────────────────────────────────────
+output_root: ./output
+
+# ── Filter CSV files ───────────────────────────────────────────────────────────
+filter_root: ./filter
+
+# ── Model checkpoints (weight files, NOT bundled) ──────────────────────────────
+# Download / place weights into each folder.
+# See checkpoints/repo/SETUP.md for links and instructions.
+checkpoints:
+  beats:   ./checkpoints/BEATs
+  clap630: ./checkpoints/CLAP630
+  clapm:   ./checkpoints/CLAPM
+  passt:   ./checkpoints/PaSST
+  m2d:     ./checkpoints/M2D
+
+# ── Source repos (git-cloned, NOT bundled) ─────────────────────────────────────
+# See checkpoints/repo/SETUP.md for clone commands.
+repos:
+  clap:          ./checkpoints/repo/CLAP
+  pretrained_sed: ./checkpoints/repo/PretrainedSED
+  unilm:         ./checkpoints/repo/unilm
+  m2d:           ./checkpoints/repo/m2d

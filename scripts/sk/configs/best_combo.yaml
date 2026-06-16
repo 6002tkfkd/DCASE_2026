@@ -1,0 +1,64 @@
+# sk best-combo 재현 config.
+# 4개 모델 OOF-stacking (hF1 84.38 / acc 85.36 / top_acc 92.43, dcase_ensemble에서 탐색됨).
+#
+# 심링크를 쓰지 않고, dcase_ensemble의 체크포인트/임베딩을 legacy_data_root 상대경로로
+# 직접 참조한다. model_pool[].experiment_dir, eval.audio_dirs/text_dir은 모두
+# legacy_data_root 기준 상대경로다.
+
+meta:
+  legacy_data_root: ../dcase_ensemble      # MESH 저장소 루트 기준 상대경로
+  cache_root: ./scripts/sk/cache           # MESH 안, extract_cache.py 실행 시 생성
+  output_root: ./scripts/sk/ensemble_output
+  seed: 1821
+  batch_size: 256
+  num_workers: 4
+
+# legacy_data_root 기준 상대경로. 두 모델(backbone) 모두 35k pretrain -> 10k finetune
+# two-stage 학습 결과라 pretrain/(35k), both/fold_k/(10k) 양쪽이 같은 experiment_dir
+# 아래에 들어있다.
+model_pool:
+  - name: clap_music_as_chunk_mean__e1pr__ce_hf1_grand_c
+    short_name: A
+    experiment_dir: output/clap_music_as_chunk_mean/last_exp01_proxy/pre_proxy_simple_ft_ce_cosine_hf1_filter1_grand_40_filter2_conf1/base_classifier_proxy_anchor_simple
+
+  - name: m2d_clap_vit_base_meanstd__e1hl__foc_acc_grand_c
+    short_name: B
+    experiment_dir: output/m2d_clap_vit_base_meanstd/two_stage_exp1_hloss/pre_h_loss_proxy_simple_ft_focal_cosine_accuracy_filter1_grand_40_filter2_conf1/base_classifier_proxy_anchor_simple
+
+  - name: clap_music_as_chunk_mean__e1pr__foc_hf1_union_c
+    short_name: C
+    experiment_dir: output/clap_music_as_chunk_mean/last_exp01_proxy/pre_proxy_simple_ft_focal_cosine_hf1_filter1_union_filter2_conf1/base_classifier_proxy_anchor_simple
+
+  - name: m2d_clap_vit_base_meanstd__e2pr__foc_hf1_el2n_c
+    short_name: D
+    experiment_dir: output/m2d_clap_vit_base_meanstd/two_stage_exp2_proxy/pre_proxy_simple_ft_focal_cosine_hf1_filter1_el2n_40_filter2_conf1/base_classifier_proxy_anchor_simple
+
+search:
+  k_folds: 5
+  min_combo_size: 4
+  max_combo_size: 4
+  option_a:
+    enabled: false
+  option_b:
+    enabled: true
+    model_type: oof_stacking
+    hidden_sizes: [64]
+    fusion_types: [softmax_gate]
+    dropout_rates: [0.3]
+    num_epochs: 100
+    lr: 0.001
+    patience: 15
+
+# export_best_combo.py가 사용하는 고정 조합 (model_pool의 short_name 순서대로).
+best_combo:
+  model_type: oof_stacking
+  models: [A, B, C, D]
+
+# eval(.wav 신규 추론)용 임베딩 위치. legacy_data_root 기준 상대경로.
+# 학습 임베딩 경로(embedding/<model>/10k/...)에서 유도하지 않고 명시값을 쓴다 — 실제
+# eval 임베딩은 dcase26_hac_eval_submission 아래 다른 이름 규칙으로 저장되어 있기 때문.
+eval:
+  audio_dirs:
+    clap_music_as_chunk_mean: data/dcase26_hac_eval_submission/eval_clap_music_as_chunk_mean
+    m2d_clap_vit_base_meanstd: data/dcase26_hac_eval_submission/eval_m2d_clap_vit_base_meanstd
+  text_dir: data/dcase26_hac_eval_submission/eval_clap_text_embeddings

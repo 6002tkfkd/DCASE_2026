@@ -1,0 +1,8 @@
+option,n_models,backbones,model_weights,hyperparams,avg_hF1,std_hF1,avg_accuracy,std_accuracy,avg_top_accuracy,std_top_accuracy,n_folds,models_used
+B,4,A | B | C | D,,"{""model_type"":""oof_stacking"",""hidden_size"":64,""fusion_type"":""softmax_gate"",""dropout_rate"":0.3,""num_epochs"":100,""lr"":0.001,""patience"":15}",84.3803,0.0000,85.3558,0.0000,92.4270,0.0000,5,"A,B,C,D"
+B,3,A | B | C,,"{""model_type"":""oof_stacking"",""hidden_size"":64,""fusion_type"":""softmax_gate"",""dropout_rate"":0.3,""num_epochs"":100,""lr"":0.001,""patience"":15}",84.1788,0.0000,85.0821,0.0000,92.3814,0.0000,5,"A,B,C"
+B,2,A | B,,"{""model_type"":""oof_stacking"",""hidden_size"":64,""fusion_type"":""softmax_gate"",""dropout_rate"":0.3,""num_epochs"":100,""lr"":0.001,""patience"":15}",84.0472,0.0000,84.9453,0.0000,92.1077,0.0000,5,"A,B"
+A,1,A,,"{""strategy"":""simple_average""}",81.4268,0.5999,82.5912,0.7131,90.7482,0.2687,5,A
+A,1,C,,"{""strategy"":""simple_average""}",81.2243,0.7015,82.5091,0.5892,90.6296,0.4176,5,C
+A,1,B,,"{""strategy"":""simple_average""}",81.1238,0.5800,82.6004,0.4101,90.4745,0.1808,5,B
+A,1,D,,"{""strategy"":""simple_average""}",80.9357,0.4072,82.4453,0.5952,90.1186,0.2469,5,D

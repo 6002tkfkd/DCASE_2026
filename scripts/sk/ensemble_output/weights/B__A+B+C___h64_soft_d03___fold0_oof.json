@@ -1,0 +1,31 @@
+{
+  "job_id": "B__A+B+C___h64_soft_d03___fold0_oof_fold0",
+  "option": "B",
+  "model_type": "oof_stacking",
+  "models": [
+    "A",
+    "B",
+    "C"
+  ],
+  "model_names": [
+    "clap_music_as_chunk_mean__e1pr__ce_hf1_grand_c",
+    "m2d_clap_vit_base_meanstd__e1hl__foc_acc_grand_c",
+    "clap_music_as_chunk_mean__e1pr__foc_hf1_union_c"
+  ],
+  "hyperparams": {
+    "model_type": "oof_stacking",
+    "hidden_size": 64,
+    "fusion_type": "softmax_gate",
+    "dropout_rate": 0.3,
+    "num_epochs": 100,
+    "lr": 0.001,
+    "patience": 15
+  },
+  "k_folds": 5,
+  "metrics": {
+    "accuracy": 85.08211678832117,
+    "top_accuracy": 92.38138686131386,
+    "hF1": 84.17880082611283
+  },
+  "created_at": "2026-06-16T08:39:01.905824+00:00"
+}
